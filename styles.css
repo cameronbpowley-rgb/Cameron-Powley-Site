@@ -1,0 +1,56 @@
+/* Requirement: Custom Background Color (Celtics Green) */
+body {
+    background-color: #007A33;
+    color: white; /* Requirement: Style that specifies font color */
+    font-family: 'Trebuchet MS', sans-serif; /* Requirement: Style that specifies font family */
+    margin: 0;
+    padding: 0;
+}
+
+/* Requirement: Div Positioning (Header) */
+.header-section {
+    background-color: #BA9653; /* Gold accents */
+    padding: 20px;
+    text-align: center;
+    border-bottom: 5px solid #000;
+}
+
+/* Requirement: Div Positioning (Main Content) */
+.main-content {
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    line-height: 1.6;
+}
+
+/* Requirement: Div Positioning (Tableau) */
+.tableau-section {
+    background-color: white;
+    color: #333;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+/* Additional Styles */
+h1, h2 {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+nav a:hover {
+    color: #000;
+}
+
+.video-container {
+    margin-top: 20px;
+    border: 3px solid #BA9653;
+}

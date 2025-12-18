@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cameron Powley | Professional Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #15304a; 
+      --panel-dark: rgba(17, 42, 68, 0.82); 
+      --border-light: #6fa8dc;
+      --text-light: #ffffff;
+      --text-muted: #cfe2f3;
+      --accent: #9fc5e8;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: url('images/IMG_0196.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 3rem 1.5rem 0.5rem;
+      text-align: center;
+      background: linear-gradient(to bottom, 
+                  rgba(21, 48, 74, 1) 0%, 
+                  rgba(21, 48, 74, 0.7) 60%, 
+                  transparent 100%);
+    }
+
+    header h1 {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+    }
+
+    header p {
+      margin-top: 0.2rem;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1rem 1rem;
+      background: transparent;
+      flex-wrap: nowrap; 
+      overflow-x: auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    nav button, nav a.nav-btn, .sub-nav button {
+      background: rgba(17, 42, 68, 0.6);
+      border: 1px solid var(--border-light);
+      color: var(--text-light);
+      padding: 0.5rem 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    nav button:hover, nav button.active, nav a.nav-btn:hover,
+    .sub-nav button:hover, .sub-nav button.active {
+      background-color: var(--border-light);
+      color: #0b1c2d;
+      transform: translateY(-2px);
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 0 auto 3rem; 
+      padding: 0 1.5rem 3rem;
+    }
+
+    #about { margin-top: 45vh; }
+    #experience, #volunteer, #education { margin-top: 1rem; }
+
+    section { display: none; animation: fadeIn 0.4s ease-in-out; }
+    section.active { display: block; }
+
+    .card {
+      background-color: var(--panel-dark);
+      border: 1px solid rgba(111, 168, 220, 0.2);
+      border-radius: 12px;
+      padding: 2.2rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .about-layout { display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap; }
+    .about-text { flex: 2; min-width: 300px; }
+    .about-image { flex: 1; min-width: 250px; text-align: center; }
+    .about-image img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 10px;
+      border: 2px solid var(--accent);
+    }
+
+    h2 { margin-top: 0; font-family: 'Oswald', sans-serif; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
+    h3 { color: var(--text-light); margin-top: 1.5rem; }
+    .job-date { color: var(--accent); font-weight: 600; font-size: 0.95rem; margin-top: -1rem; display: block; margin-bottom: 1rem; }
+    ul { padding-left: 1.2rem; }
+    li { margin-bottom: 0.5rem; color: var(--text-muted); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+    .grid figure { margin: 0; text-align: center; }
+    .grid img {
+      width: 100%;
+      height: 200px; 
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .grid img:hover { transform: scale(1.02); }
+    .grid figcaption { display: none; }
+
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border-light); margin-top: 1.5rem; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+    .sub-nav { display: flex; justify-content: flex-start; gap: 0.75rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px dashed rgba(111, 168, 220, 0.3); overflow-x: auto; }
+
+    .job-content { display: none; }
+    .job-content.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    #lightbox-modal {
+      display: none; 
+      position: fixed; 
+      z-index: 100; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0, 0, 0, 0.95);
+      overflow-y: auto; 
+      padding: 40px 10px;
+    }
+    #lightbox-content { 
+      margin: auto; 
+      display: block; 
+      width: 90%; 
+      max-width: 800px; 
+      text-align: center; 
+    }
+    #lightbox-img { 
+      width: 100%; 
+      height: auto;
+      border-radius: 5px; 
+      border: 3px solid white; 
+    }
+    #lightbox-caption {
+      margin: 20px auto;
+      color: #ffffff;
+      font-size: 1.15rem;
+      font-weight: 400;
+      line-height: 1.5;
+      max-width: 700px;
+    }
+    .close-btn { 
+      position: fixed; 
+      top: 15px; 
+      right: 35px; 
+      color: #f1f1f1; 
+      font-size: 45px; 
+      font-weight: bold;
+      cursor: pointer; 
+      z-index: 110;
+    }
+
+    footer { text-align: center; padding: 2rem; background: rgba(17, 42, 68, 0.9); border-top: 2px solid var(--border-light); color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Cameron Powley</h1>
+  <p>International Relations Student | Educator | Leader & Mentor</p>
+</header>
+
+<nav>
+  <button onclick="showTab('about')">About Me</button>
+  <button onclick="showTab('experience')">Work Experience</button>
+  <button onclick="showTab('volunteer')">Volunteer Experience</button>
+  <button onclick="showTab('education')">Education & Accomplishments</button>
+  <a href="myscratchpage.html" class="nav-btn" target="_blank">My Favorite Basketball Player</a>
+  <button onclick="openGameLink()">Personal Project (Game)</button> 
+</nav>
+
+<main>
+  <section id="about">
+    <div class="card">
+      <div class="about-layout">
+        <div class="about-text">
+          <h2>About Me</h2>
+          <p>I am an International Relations student at Brigham Young University with a strong passion for leadership, teaching, and mentoring. My academic focus and professional experiences emphasize communication, cultural understanding, and service-oriented leadership.</p>
+          <p>Originally from Pacific Grove, CA, I moved to Provo in January 2025. I enjoy connecting with people from diverse backgrounds and am dedicated to creating vibrant, inclusive environments through hard work and creativity.</p>
+          <div class="contact-info" style="display:flex; flex-wrap:wrap; gap:1.5rem; border-top:1px solid rgba(111,168,220,0.3); padding-top:1rem; margin-top:1rem;">
+            <div>📍 Provo, UT</div>
+            <div>📞 (831) 905-0962</div>
+            <div>✉️ <a href="mailto:cameronbpowley@gmail.com" style="color:var(--accent);">Email Me</a></div>
+            <div>🔗 <a href="https://www.linkedin.com/in/cameron-powley" target="_blank" style="color:var(--accent); font-weight: bold;">LinkedIn</a></div>
+         </div>
+        </div>
+        <div class="about-image">
+          <figure onclick="openLightbox(this)" style="margin:0; cursor:pointer;">
+            <img src="images/IMG_0220.jpg" alt="Cameron Powley Headshot" data-caption="Professional Headshot (Provo, UT)">
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="card">
+      <h2>Work Experience</h2>
+      <div class="sub-nav">
+        <button class="active" onclick="showWorkExperience('portuguese')">Portuguese Instructor</button>
+        <button onclick="showWorkExperience('lula')">Lula Lund's Chocolates</button>
+      </div>
+      
+      <div id="portuguese-content" class="job-content active">
+        <h3>Portuguese Language Instructor – Provo MTC</h3>
+        <span class="job-date">May 2025 – Present</span>
+        <p>Leading classes to prepare missionaries for international service.</p>
+        <div class="grid">
+          <figure onclick="openLightbox(this)"><img src="images/affb5dba930b39daa7302c828844a76d.jpeg" data-caption="Welcoming my first district os missionaries to the MTC in-person; we spent a week online discussing their purpose and practicing teaching"></figure>
+          <figure onclick="openLightbox(this)"><img src="images/IMG_3186.jpeg" data-caption="Sending off my first district to serve in their respective assignments; in our six weeks together, they all developed into high-novice/intermediate Portuguese speakers"></figure>
+          <figure onclick="openLightbox(this)"><img src="images/IMG_3225.jpeg" data-caption="Welcoming my biggest district of missionaries to the MTC in-person; in this meeting, I facilitated a discussion where we set classroom culture and expectations to help them grow"></figure>
+          <figure onclick="openLightbox(this)"><img src="images/IMG_3287.jpeg" data-caption="Ending a class with a group of missionaries where we practiced teaching and listening to understand the needs of others in Portuguese"></figure>
+          <figure onclick="openLightbox(this)"><img src="images/Screenshot 2025-10-20 at 9.03.00 PM.jpeg" data-caption="A Zoom class with a district of missionaries on their first day; I taught and mentored them what it means to be a missionary"></figure>
+          <figure onclick="openLightbox(this)"><img src="images/IMG_3692.jpeg" data-caption="Sending off a recent district; all of these missionaries developed intermediate Portuguese skills"></figure>
+        </div>
+      </div>
+
+      <div id="lula-content" class="job-content">
+        <h3>Assistant Operations Manager – Lula Lund’s Chocolates</h3>
+        <span class="job-date">August 2024 – December 2024</span>
+        <p>Managing logistics and leading inclusive teams.</p>
+        <div class="grid">
+            <figure onclick="openLightbox(this)"><img src="images/IMG_0663.jpg" data-caption="Working together with a variety of co-workers to package Christmas orders"></figure>
+            <figure onclick="openLightbox(this)"><img src="images/IMG_0232.jpeg" data-caption="My workspace where I organized and consolidated the process of packaging orders"></figure>
+            <figure onclick="openLightbox(this)"><img src="images/IMG_0155.jpeg" data-caption="A display of my chocolate stacking skills"></figure>
+            <figure onclick="openLightbox(this)"><img src="images/IMG_0157.jpeg" data-caption="Another display of my chocolate stacking skills"></figure>
+            <figure onclick="openLightbox(this)"><img src="images/IMG_0380.jpeg" data-caption="During my work, I managed and mentored individuals with autism and helped created meaningful relationships with them"></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="volunteer">
+    <div class="card">
+      <h2>Volunteer Experience</h2>
+      <h3>Lisbon, Portugal Mission</h3>
+      <p><em>Volunteer Representative | Sep 2022 – Aug 2024</em></p>
+      <ul>
+        <li>Trained and mentored 250+ volunteers</li>
+        <li>Taught 1,400+ lessons and 200+ English classes</li>
+        <li>Worked 60–80 hours weekly in leadership capacities</li>
+      </ul>
+
+      <div class="grid">
+        <figure onclick="openLightbox(this)"><img src="images/MTC.jpeg" data-caption="Beginning my Portuguese training at the Provo Missionary Training Center"></figure>
+        <figure onclick="openLightbox(this)"><img src="images/Texas.jpeg" data-caption="Serving briefly in San Antonio, Texas, I developed greater emotional resilience and a capacity to relate with others"></figure>
+        <figure onclick="openLightbox(this)"><img src="images/Arrival.jpeg" data-caption="Arriving in Portugal and meeting my long-time mentors, President and Sister Barcellos"></figure>
+        <figure onclick="openLightbox(this)"><img src="images/Porto.jpeg" data-caption="Serving in the city of Porto in the north, I helped teach about Jesus Christ and help others better their lives"></figure>
+        <figure onclick="openLightbox(this)"><img src="images/Porto_Batismo.jpeg" data-caption="Helping a friend, Renan, develop a stronger relationship with Jesus Christ through baptism"></figure>
+        <figure onclick="openLightbox(this)"><img src="images/Training.jpeg" data-caption="As a missionary, I taught others in Portugal and had the opportunity to train and mentor my peers and other missionaries serving alongside me as I fulfilled many leadership capacities"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="card">
+      <h2>Education & Accomplishments</h2>
+      <h3>Brigham Young University</h3>
+      <p>International Relations — Expected April 2028</p>
+      <ul>
+        <li>Marriott School of Business – Dean’s List (Winter 2025)</li>
+        <li>BYUSA Student Advisory Council Member</li>
+        <li>3.95 GPA</li>
+      </ul>
+
+      <h3>Pacific Grove High School</h3>
+      <p>High School Diploma — 2018 - 2022</p>
+      <ul>
+        <li>4-Year Top 10 Student</li>
+        <li>National Honors Society Member</li>
+        <li>ASB Vice President (Senior Year)</li>
+        <li>2x ASB Publicity Commissioner</li>
+        <li>Freshman Class President</li>
+        <li>4-Year Basketball Athlete (County All-Sportsmanship Team)</li>
+        <li>2-Year Track Athlete</li>
+        <li>4.2 GPA</li>
+      </ul>
+
+      <h3 style="margin-top: 2rem;">Leadership Highlight</h3>
+      <p>A campaign video of my running for ASB Publicity Commissioner my Sophomore year of High School</p>
+      <div class="video-container">
+        <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/tbnVy0hKyDc" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="lightbox-modal">
+    <span class="close-btn" onclick="closeLightbox()">&times;</span>
+    <div id="lightbox-content">
+        <img id="lightbox-img">
+        <div id="lightbox-caption"></div>
+    </div>
+</div>
+
+<footer>© 2025 Cameron Powley · <a href="https://www.linkedin.com/in/cameron-powley" target="_blank" style="color:var(--accent); text-decoration:none;">LinkedIn</a></footer>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+    const targetSection = document.getElementById(id);
+    if (targetSection) targetSection.classList.add('active');
+    const btn = document.querySelector(`nav button[onclick="showTab('${id}')"]`);
+    if(btn) btn.classList.add('active');
+    if (id === 'experience') showWorkExperience('portuguese');
+  }
+
+  function showWorkExperience(id) {
+    document.querySelectorAll('.job-content').forEach(content => content.classList.remove('active'));
+    document.querySelectorAll('.sub-nav button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(id + '-content').classList.add('active');
+    const btn = document.querySelector(`.sub-nav button[onclick="showWorkExperience('${id}')"]`);
+    if(btn) btn.classList.add('active');
+  }
+
+  function openGameLink() { window.open('game1.html', '_blank'); }
+
+  function openLightbox(figureElement) {
+    const imgElement = figureElement.querySelector('img');
+    const captionText = imgElement.getAttribute('data-caption');
+    const modal = document.getElementById('lightbox-modal');
+    const modalImg = document.getElementById('lightbox-img');
+    const modalCaption = document.getElementById('lightbox-caption');
+    
+    modal.style.display = 'block';
+    modalImg.src = imgElement.src;
+    modalCaption.innerHTML = captionText || "";
+    document.body.style.overflow = "hidden"; 
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox-modal').style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+
+  window.onclick = function(event) {
+    if (event.target == document.getElementById('lightbox-modal')) {
+      closeLightbox();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { showTab('about'); });
+</script>
+
+</body>
+</html>

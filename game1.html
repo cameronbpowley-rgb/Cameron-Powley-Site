@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Santa Elf Dash</title>
+<link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* UPDATED: Lighter Sky Blue Background */
+body { margin:0; overflow:hidden; font-family:sans-serif; background-color:#b3e5fc; }
+
+#game {
+  position:relative; width:100vw; height:100vh; overflow:hidden;
+  background:url('images/snowy_forest.png') no-repeat center/cover;
+  filter: brightness(0.9);
+}
+
+#overlay,#frost { position:absolute; top:0; left:0; width:100%; height:100%; }
+#overlay { background-color: rgba(0,0,0,0.3); z-index:0; }
+#frost { background: rgba(255,255,255,0.1); z-index:2; pointer-events:none; }
+
+.player {
+  position:absolute; width:70px; height:70px; left:50px; top:50%;
+  transform: translateY(-50%); z-index:3;
+  background:url('images/elf.png') no-repeat center/contain;
+  filter: drop-shadow(3px 3px 4px rgba(0,0,0,0.5));
+}
+
+.obstacle {
+  position:absolute; 
+  width:120px; 
+  height:120px; 
+  z-index:3;
+  background-size:contain; background-repeat:no-repeat; background-position:center;
+  filter: drop-shadow(3px 3px 4px rgba(0,0,0,0.5));
+}
+.ice { background-image:url('images/ice.png'); }
+.tree { background-image:url('images/tree.png'); }
+.bear { background-image:url('images/polarbear.png'); }
+
+.coin {
+  position:absolute; 
+  width:40px; 
+  height:40px; 
+  border-radius:50%; 
+  z-index:3;
+  /* Cookie Image */
+  background-image: url('images/cookie.png'); 
+  background-size: cover; 
+  background-repeat: no-repeat;
+  filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5));
+}
+
+/* UPDATED: Styling for detailed snowflake character */
+.snowflake { 
+  position:absolute; 
+  background-color:transparent;
+  color: white; 
+  font-size: 16px; /* Larger for detail */
+  border-radius:0;
+  opacity:0.7; 
+  pointer-events:none; 
+  z-index:1; 
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8); /* Subtle glow effect */
+}
+
+#score, #coinCounter {
+  position:absolute; top:10px; color:white; font-size:28px;
+  text-shadow:2px 2px 4px black; z-index:3;
+  font-family: 'Mountains of Christmas', cursive;
+}
+#score { left:10px; }
+#coinCounter { left:200px; }
+
+#startScreen {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background-color: rgba(0,0,0,0.5); z-index:4;
+  display:flex; justify-content:center; align-items:center; color:white;
+  font-size:36px; text-align:center; flex-direction:column;
+  font-family: 'Mountains of Christmas', cursive;
+}
+#playerNameInput {
+  font-size:28px; padding:5px; margin-top:10px;
+  font-family: 'Mountains of Christmas', cursive;
+  border-radius:5px; border:2px solid white; background:rgba(255,255,255,0.8);
+  text-align:center;
+}
+#startButton {
+    font-size: 32px;
+    padding: 10px 20px;
+    margin-top: 30px;
+    cursor: pointer;
+    background-color: #007a33; /* Darker Green */
+    color: white;
+    border: 3px solid #ba9653; /* Gold Border */
+    border-radius: 10px;
+    font-family: 'Mountains of Christmas', cursive;
+    transition: background-color 0.2s;
+}
+#startButton:hover {
+    background-color: #005f27;
+}
+
+
+#highScores, #globalLeaderboard {
+  position:absolute; top:50px; right:10px; color:white; font-size:20px; text-shadow:1px1px2px black;
+  z-index:3; background:rgba(0,0,0,0.4); padding:10px; border-radius:8px;
+  font-family: 'Mountains of Christmas', cursive;
+}
+#globalLeaderboard { top:auto; bottom:10px; right:10px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="overlay"></div>
+  <div id="frost"></div>
+  <div id="score">Feet: 0</div>
+  <div id="coinCounter">Coins: 0</div>
+  <div class="player" id="player"></div>
+
+  <div id="startScreen">
+    <div>Enter Player Name:</div>
+    <input type="text" id="playerNameInput" placeholder="Your Name">
+    <button id="startButton">Start Dash!</button>
+    <div id="globalLeaderboard"></div>
+  </div>
+
+  <div id="highScores"></div>
+  
+  <audio id="jingle" loop>
+    <source src="sounds/elfmusic.mp3" type="audio/mpeg">
+    <source src="sounds/Main Title - Elf (Original Motion Picture Score).mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+</div>
+
+<script>
+const game = document.getElementById('game');
+const player = document.getElementById('player');
+const scoreDisplay = document.getElementById('score');
+const coinCounterDisplay = document.getElementById('coinCounter');
+const startScreen = document.getElementById('startScreen');
+const playerNameInput = document.getElementById('playerNameInput');
+const highScoresDiv = document.getElementById('highScores');
+const globalLeaderboardDiv = document.getElementById('globalLeaderboard');
+const jingle = document.getElementById('jingle');
+const startButton = document.getElementById('startButton'); 
+
+let playerY = game.offsetHeight/2 - 35;
+let velocityY = 0;
+const maxSpeed = 20;
+const acceleration = 3;
+const friction = 0.9;
+
+// --- COLLISION CONSTANTS ---
+const playerVisualSize = 70;
+const obstacleVisualSize = 120; 
+const coinVisualSize = 40;
+
+const playerCollisionWidth = 35; 
+const playerCollisionHeight = 45; 
+
+const obstacleCollisionWidth = 40; 
+const obstacleCollisionHeight = 50; 
+
+const coinCollisionSize = 60; 
+
+const playerXOffset = (playerVisualSize - playerCollisionWidth) / 2;
+const playerYOffset = (playerVisualSize - playerCollisionHeight) / 2;
+
+const obstacleXOffset = (obstacleVisualSize - obstacleCollisionWidth) / 2;
+const obstacleYOffset = (obstacleVisualSize - obstacleCollisionHeight) / 2;
+
+const coinOffset = (coinVisualSize - coinCollisionSize) / 2; 
+
+let obstacles = [];
+let coins = [];
+let score = 0;
+let coinCount = 0;
+let gameSpeed = 4;
+const speedIncrement = 1;
+const distanceIncrement = 500;
+let obstacleInterval = 1500;
+let coinInterval = 3000; 
+
+let keys = {ArrowUp:false, ArrowDown:false};
+let gameStarted = false;
+let playerName = '';
+
+// UPDATED: Snowflake creation uses the Unicode character
+const snowflakes=[];
+for(let i=0;i<150;i++){
+  const s=document.createElement('div');
+  s.classList.add('snowflake');
+  s.textContent = '❄'; // Use the snowflake character
+  // Use a random value for opacity to vary the look
+  s.style.opacity = 0.5 + Math.random() * 0.5; 
+  s.style.left=Math.random()*window.innerWidth+'px';
+  s.style.top=Math.random()*window.innerHeight+'px';
+  game.appendChild(s);
+  snowflakes.push({el:s,speed:0.5+Math.random()*2,drift:(Math.random()-0.5)*0.5});
+}
+
+function updateSnow(){
+  snowflakes.forEach(s=>{
+    let top=parseFloat(s.el.style.top);
+    let left=parseFloat(s.el.style.left);
+    top+=s.speed; left+=s.drift;
+    if(top>window.innerHeight) top=-5;
+    if(left<0) left=window.innerWidth;
+    if(left>window.innerWidth) left=0;
+    s.el.style.top=top+'px';
+    s.el.style.left=left+'px';
+  });
+  requestAnimationFrame(updateSnow);
+}
+updateSnow();
+
+function updateGlobalLeaderboard(){
+  const allScores = JSON.parse(localStorage.getItem('globalScores')||'[]');
+  allScores.sort((a,b)=>b.score-a.score);
+  const top5 = allScores.slice(0,5);
+  globalLeaderboardDiv.innerHTML = `<strong>Global Leaderboard</strong><br>` +
+    top5.map((s,i)=>`${i+1}. ${s.name}: ${s.score} feet`).join('<br>');
+}
+updateGlobalLeaderboard();
+
+// Start the game ONLY on button click
+startButton.addEventListener('click', () => {
+    if (!gameStarted) {
+        playerName = playerNameInput.value.trim() || 'Player';
+        gameStarted = true;
+        startScreen.style.display = 'none';
+        
+        jingle.play().catch(error => {
+            console.error("Music failed to play:", error);
+        }); 
+        showHighScores();
+    }
+});
+
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowUp') keys.ArrowUp=true;
+  if(e.key==='ArrowDown') keys.ArrowDown=true;
+});
+document.addEventListener('keyup', e=>{
+  if(e.key==='ArrowUp') keys.ArrowUp=false;
+  if(e.key==='ArrowDown') keys.ArrowDown=false;
+});
+
+function spawnObstacle(){
+  if(!gameStarted) return;
+  const obstacle=document.createElement('div');
+  obstacle.classList.add('obstacle');
+  const type=['ice','tree','bear'][Math.floor(Math.random()*3)];
+  obstacle.classList.add(type);
+  obstacle.style.left=game.offsetWidth+'px';
+  obstacle.style.top=Math.random()*(game.offsetHeight-obstacleVisualSize)+'px'; 
+  game.appendChild(obstacle);
+  obstacles.push(obstacle);
+}
+
+function spawnCoin(){
+  if(!gameStarted) return;
+  const coin=document.createElement('div');
+  coin.classList.add('coin');
+  coin.style.left=game.offsetWidth+'px';
+  coin.style.top=Math.random()*(game.offsetHeight-coinVisualSize)+'px';
+  game.appendChild(coin);
+  coins.push(coin);
+}
+
+function showHighScores(){
+  const scores = JSON.parse(localStorage.getItem(playerName))||[];
+  highScoresDiv.innerHTML = `<strong>${playerName}'s Last 5 Scores</strong><br>` +
+    scores.map((s,i)=>`${i+1}. ${s} feet`).join('<br>');
+}
+
+function updateHighScores(finalScore){
+  const scores = JSON.parse(localStorage.getItem(playerName))||[];
+  scores.unshift(finalScore);
+  if(scores.length>5) scores.pop();
+  localStorage.setItem(playerName,JSON.stringify(scores));
+
+  // update global leaderboard
+  const allScores = JSON.parse(localStorage.getItem('globalScores')||'[]');
+  allScores.push({name:playerName,score:finalScore});
+  localStorage.setItem('globalScores',JSON.stringify(allScores));
+  updateGlobalLeaderboard();
+}
+
+// Initial setup for spawners
+let obstacleSpawner;
+let coinSpawner;
+
+function update(){
+  if(gameStarted){
+    if(keys.ArrowUp) velocityY-=acceleration;
+    if(keys.ArrowDown) velocityY+=acceleration;
+    velocityY*=friction;
+    if(velocityY>maxSpeed) velocityY=maxSpeed;
+    if(velocityY<-maxSpeed) velocityY=-maxSpeed;
+    playerY+=velocityY;
+    if(playerY<0){playerY=0; velocityY=0;}
+    if(playerY>game.offsetHeight-playerVisualSize){playerY=game.offsetHeight-playerVisualSize; velocityY=0;} 
+    player.style.top=playerY+'px';
+
+    // Obstacles collision 
+    obstacles.forEach((obs,index)=>{
+      obs.style.left=(obs.offsetLeft-gameSpeed)+'px';
+      if(obs.offsetLeft+obstacleVisualSize<0){ obs.remove(); obstacles.splice(index,1);}
+
+      // Calculate Player Bounding Box (AABB)
+      const playerX1 = player.offsetLeft + playerXOffset;
+      const playerY1 = player.offsetTop + playerYOffset;
+      const playerX2 = playerX1 + playerCollisionWidth;
+      const playerY2 = playerY1 + playerCollisionHeight;
+
+      // Calculate Obstacle Bounding Box (AABB)
+      const obsX1 = obs.offsetLeft + obstacleXOffset;
+      const obsY1 = obs.offsetTop + obstacleYOffset;
+      const obsX2 = obsX1 + obstacleCollisionWidth;
+      const obsY2 = obsY1 + obstacleCollisionHeight;
+      
+      // AABB Collision check
+      if(!(playerX2 < obsX1 ||
+           playerX1 > obsX2 ||
+           playerY2 < obsY1 ||
+           playerY1 > obsY2)){
+        // COLLISION DETECTED
+        alert(`Game Over! Score: ${score}, Coins: ${coinCount}`);
+        updateHighScores(score);
+        showHighScores();
+        jingle.pause(); 
+        window.location.reload();
+      }
+    });
+
+    // Coins collision 
+    coins.forEach((coin,index)=>{
+      coin.style.left=(coin.offsetLeft-gameSpeed)+'px';
+      if(coin.offsetLeft+coinVisualSize<0){ coin.remove(); coins.splice(index,1);}
+
+      // Calculate Player Bounding Box
+      const playerX1 = player.offsetLeft + playerXOffset;
+      const playerY1 = player.offsetTop + playerYOffset;
+      const playerX2 = playerX1 + playerCollisionWidth;
+      const playerY2 = playerY1 + playerCollisionHeight;
+      
+      // Calculate Coin Bounding Box (using large size and negative offset)
+      const coinX1 = coin.offsetLeft + coinOffset;
+      const coinY1 = coin.offsetTop + coinOffset;
+      const coinX2 = coinX1 + coinCollisionSize;
+      const coinY2 = coinY1 + coinCollisionSize;
+
+      // Collision check
+      if(!(playerX2 < coinX1 ||
+           playerX1 > coinX2 ||
+           playerY2 < coinY1 ||
+           playerY1 > coinY2)){
+        // COIN COLLECTED
+        score+=15;
+        coinCount++;
+        coin.remove(); coins.splice(index,1);
+      }
+    });
+
+    score+=1;
+    scoreDisplay.textContent=`Feet: ${score}`;
+    coinCounterDisplay.textContent=`Coins: ${coinCount}`;
+
+    if(score % distanceIncrement===0) gameSpeed+=speedIncrement;
+    
+    // Obstacle and Coin pollution logic (more frequent/aggressive interval reduction)
+    if(score > 0 && score % 500 === 0){ 
+      // Decrease obstacle interval (increase obstacle frequency)
+      obstacleInterval = Math.max(400, obstacleInterval - 50); 
+      clearInterval(obstacleSpawner);
+      obstacleSpawner=setInterval(spawnObstacle,obstacleInterval);
+
+      // Decrease coin interval (increase coin frequency)
+      coinInterval = Math.max(1000, coinInterval - 200);
+      clearInterval(coinSpawner);
+      coinSpawner=setInterval(spawnCoin,coinInterval);
+    }
+  }
+  requestAnimationFrame(update);
+}
+
+// Set up initial spawners
+obstacleSpawner=setInterval(spawnObstacle,obstacleInterval);
+coinSpawner=setInterval(spawnCoin,coinInterval);
+
+update();
+</script>
+</body>
+</html>
